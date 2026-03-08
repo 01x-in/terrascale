@@ -51,6 +51,7 @@ Follow `PRODUCT_SPEC.md` Section 15 strictly. The phases are:
 **Rules:**
 - Each step must compile (`go build ./...`) before moving to the next
 - Each step's tests must pass (`go test ./...`) before moving on
+- **Commit work after each successfully completed task** — every step that compiles and passes tests should be committed before moving on
 - Do NOT skip ahead to later phases
 - Do NOT add features not in the product spec
 
