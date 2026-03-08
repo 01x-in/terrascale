@@ -1002,7 +1002,7 @@ THIS SECTION IS THE EXPLICIT BUILD PLAN. Follow this exact order. Do not skip ah
 ### Phase 1: Foundation (No dependencies — build first)
 
 **Step 1A: Go project scaffold**
-- Initialize Go module: `github.com/tushar-im/terrascale`
+- Initialize Go module: `github.com/01x-in/terrascale`
 - Set up directory structure as defined in Section 7
 - Install dependencies: cobra, yaml.v3, charmbracelet/huh, charmbracelet/lipgloss, tablewriter
 - Create `cmd/terrascale/main.go` with root cobra command (no subcommands yet)
@@ -1149,5 +1149,5 @@ Build commands in this exact order. Each command should be fully functional and 
 
 ---
 
-*TerraScale — github.com/tushar-im/terrascale*
+*TerraScale — github.com/01x-in/terrascale*
 *Built by Tushar Sarang*
