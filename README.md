@@ -53,7 +53,7 @@ Download the binary for your platform from the [Releases](https://github.com/01x
 
 ```bash
 # 1. Navigate to any existing Terraform project
-cd examples/demo-project
+cd examples/terrascale-site
 
 # 2. Initialize TerraScale
 terrascale init
@@ -244,7 +244,7 @@ terrascale/
 │   ├── registry/            # Tenant CRUD
 │   └── ui/                  # Terminal output helpers
 ├── examples/
-│   └── demo-project/        # Test fixture (local_file, no cloud resources)
+│   └── terrascale-site/     # TerraScale website deployment project
 ├── terrascale.yaml          # Generated config (per-project)
 └── .terrascale/             # Generated state directory (per-project)
 ```

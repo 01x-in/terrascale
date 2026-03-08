@@ -103,7 +103,7 @@ Follow `PRODUCT_SPEC.md` Section 15 strictly. The phases are:
 - Table-driven tests where appropriate
 - Test files live next to source code
 - For terraform executor tests: test the tfvars generation and output parsing logic. Don't require terraform binary in unit tests — use integration tests for that.
-- The `examples/demo-project/` directory is the integration test fixture
+- The `examples/terrascale-site/` directory is the website deployment example
 
 ## File Structure
 
@@ -141,7 +141,7 @@ terrascale/
 │       ├── table.go
 │       └── spinner.go
 ├── examples/
-│   └── demo-project/               # Test fixture (local_file, no AWS)
+│   └── terrascale-site/            # TerraScale website deployment example
 │       ├── main.tf
 │       ├── variables.tf
 │       └── outputs.tf
@@ -185,7 +185,7 @@ go test ./... -v                  # all tests pass
 **After Phase 3:**
 ```bash
 go build -o terrascale ./cmd/terrascale/
-cd examples/demo-project
+cd examples/terrascale-site
 ../../terrascale init             # generates terrascale.yaml
 ../../terrascale add tenant-1 --var project_name=test-1 --var subdomain=t1
 ../../terrascale add tenant-2 --var project_name=test-2 --var subdomain=t2

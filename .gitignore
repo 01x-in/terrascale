@@ -1,5 +1,6 @@
 # General
 .DS_Store
+docs/
 
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
@@ -44,3 +45,19 @@ go.work.sum
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Terraform generated files
+.terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Crash log files
+crash.log
+
+# Specific .tfvars files that might contain sensitive data
+# (consider using a consistent naming convention for sensitive files, e.g., secrets.tfvars)
+# *.tfvars 
+
+# You might want to ignore the lock file if working solo, but include it in team environments
+.terraform.lock.hcl

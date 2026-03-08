@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TerraScale | Multi-Tenant Terraform. One Command.</title>
+    <meta
+      name="description"
+      content="Provision isolated tenants from your existing Terraform project without copy-paste, workspaces, or fragile scripts."
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/basecoat.cdn.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/basecoat.min.js"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.11/dist/js/select.min.js"
+      defer
+    ></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero" id="top">
+        <nav class="topbar" aria-label="Primary">
+          <a class="brand" href="#top">
+            <img
+              class="brand-logo"
+              src="./logo-01x.svg"
+              alt="01X"
+              width="44"
+              height="20"
+            />
+            <span class="brand-text">TerraScale</span>
+          </a>
+          <div class="topbar-actions">
+            <button
+              class="menu-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="primary-menu"
+              aria-label="Open navigation menu"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <div class="nav-links">
+              <div class="nav-links-inner" id="primary-menu">
+                <a class="nav-pill" href="#how-it-works">How it Works</a>
+                <a class="nav-pill" href="#features">Features</a>
+                <a class="nav-pill" href="#quick-start">Quick Start</a>
+                <a class="nav-pill nav-pill-github" href="https://github.com/01x-in/terrascale">
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <div class="hero-grid">
+          <section class="hero-copy">
+            <p class="eyebrow">Terraform without tenant sprawl</p>
+            <h1>Multi-Tenant Terraform. <span class="nowrap">One Command.</span></h1>
+            <p class="hero-subhead">
+              Stop copy-pasting infrastructure. TerraScale provisions isolated
+              tenants from your existing Terraform project.
+            </p>
+
+            <div class="command-callout surface">
+              <div class="command-label">Install with Homebrew</div>
+              <code class="command-text">brew tap 01x-in/tap &amp;&amp; brew install terrascale</code>
+              <button
+                class="copy-button"
+                type="button"
+                data-copied="false"
+                data-copy="brew tap 01x-in/tap && brew install terrascale"
+                aria-label="Copy install command"
+                title="Copy install command"
+              >
+                <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V9Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M20 6 9 17l-5-5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span class="sr-only">Copy install command</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="terminal-panel" aria-label="Terminal demo">
+            <div class="terminal-chrome">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="terminal-body">
+              <p class="terminal-path">~/infra/your-project</p>
+              <div class="typed-command">
+                <span class="prompt">$</span>
+                <span id="typed-command" aria-live="polite"></span>
+                <span class="cursor" aria-hidden="true"></span>
+              </div>
+              <div class="terminal-output">
+                <p>&gt; Scanning Terraform root project</p>
+                <p>&gt; Generating isolated state path</p>
+                <p>&gt; Running init / plan / apply</p>
+                <p class="terminal-success">&gt; Tenant active: acme-corp</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </header>
+
+      <main>
+        <section class="section problem" id="problem">
+          <div class="section-heading">
+            <p class="eyebrow">The old options fail the same way</p>
+            <h2>Infrastructure duplication hides inside different names.</h2>
+          </div>
+          <div class="problem-grid">
+            <article class="problem-card">
+              <h3>Copy-paste the project</h3>
+              <p>
+                Fast on day one. Drifted, inconsistent, and operationally
+                radioactive by week three.
+              </p>
+            </article>
+            <article class="problem-card">
+              <h3>Lean on workspaces</h3>
+              <p>
+                Two tenants feel fine. The fourth tenant turns every destroy
+                into a trust fall.
+              </p>
+            </article>
+            <article class="problem-card">
+              <h3>Wrap it in bash</h3>
+              <p>
+                Custom glue buys speed for one engineer and mystery for everyone
+                else.
+              </p>
+            </article>
+          </div>
+          <p class="problem-note">TerraScale is the tool that should have existed.</p>
+        </section>
+
+        <section class="section workflow" id="how-it-works">
+          <div class="section-heading">
+            <p class="eyebrow">How it works</p>
+            <h2>Your Terraform project becomes a reusable stamp.</h2>
+          </div>
+
+          <div class="diagram">
+            <div class="diagram-source">
+              <span class="diagram-label">Your TF Project</span>
+              <strong>main.tf + modules + variables.tf</strong>
+            </div>
+            <div class="diagram-arrow" aria-hidden="true">→</div>
+            <div class="diagram-targets">
+              <div class="tenant-pill">acme-corp</div>
+              <div class="tenant-pill">launch-demo</div>
+              <div class="tenant-pill">staging</div>
+            </div>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card">
+              <span class="step-index">01</span>
+              <h3><code>terrascale init</code></h3>
+              <pre><code>cd your-project
+terrascale init</code></pre>
+            </article>
+            <article class="step-card">
+              <span class="step-index">02</span>
+              <h3><code>terrascale add &lt;slug&gt;</code></h3>
+              <pre><code>terrascale add acme-corp \
+  --var project_name=scaled-app \
+  --var subdomain=acme-corp</code></pre>
+            </article>
+            <article class="step-card">
+              <span class="step-index">03</span>
+              <h3><code>terrascale list</code></h3>
+              <pre><code>terrascale list
+terrascale inspect acme-corp</code></pre>
+            </article>
+          </div>
+        </section>
+
+        <section class="section features" id="features">
+          <div class="section-heading">
+            <p class="eyebrow">CLI surface</p>
+            <h2>Five commands that make tenant lifecycle explicit.</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>init</h3>
+              <p>Scan an existing Terraform project and classify tenant-specific variables.</p>
+            </article>
+            <article class="feature-card">
+              <h3>add</h3>
+              <p>Provision a tenant with isolated state, generated tfvars, and stored outputs.</p>
+            </article>
+            <article class="feature-card">
+              <h3>list</h3>
+              <p>Get a registry view of active, failed, destroyed, and filtered tenants.</p>
+            </article>
+            <article class="feature-card">
+              <h3>inspect</h3>
+              <p>Open the full tenant record: variables, outputs, timestamps, and state path.</p>
+            </article>
+            <article class="feature-card">
+              <h3>destroy</h3>
+              <p>Tear down one tenant without risking the rest of the estate.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section quick-start" id="quick-start">
+          <div class="section-heading">
+            <p class="eyebrow">Quick start</p>
+            <h2>Five minutes from existing project to multi-tenant control.</h2>
+          </div>
+          <div class="quickstart-layout">
+            <div class="quickstart-step-list" role="tablist" aria-label="Quick start steps">
+              <button
+                class="quickstart-step is-active"
+                type="button"
+                data-quickstart-step="bootstrap"
+                role="tab"
+                aria-selected="true"
+              >
+                <span class="quickstart-step-number">01</span>
+                <span class="quickstart-step-copy">
+                  <strong>Bootstrap</strong>
+                  <span>Initialize TerraScale in your Terraform root.</span>
+                </span>
+              </button>
+              <button
+                class="quickstart-step"
+                type="button"
+                data-quickstart-step="deploy"
+                role="tab"
+                aria-selected="false"
+              >
+                <span class="quickstart-step-number">02</span>
+                <span class="quickstart-step-copy">
+                  <strong>Deploy</strong>
+                  <span class="quickstart-inline-fields">
+                    <span>Deploy</span>
+                    <input
+                      id="quickstart-project-name"
+                      class="quickstart-inline-input"
+                      type="text"
+                      value="staging"
+                      aria-label="Deployment name"
+                    />
+                    <span>with subdomain</span>
+                    <input
+                      id="quickstart-subdomain"
+                      class="quickstart-inline-input"
+                      type="text"
+                      value="staging"
+                      aria-label="Subdomain"
+                    />
+                  </span>
+                </span>
+              </button>
+              <button
+                class="quickstart-step"
+                type="button"
+                data-quickstart-step="registry"
+                role="tab"
+                aria-selected="false"
+              >
+                <span class="quickstart-step-number">03</span>
+                <span class="quickstart-step-copy">
+                  <strong>Inspect the registry</strong>
+                  <span>List tenants and inspect the active deployment.</span>
+                </span>
+              </button>
+            </div>
+
+            <div class="quickstart-terminal terminal-panel">
+              <div class="terminal-chrome">
+                <span></span>
+                <span></span>
+                <span></span>
+                <p class="quickstart-window-title">Command Preview</p>
+                <button
+                  class="copy-button quickstart-title-copy"
+                  type="button"
+                  data-copied="false"
+                  data-copy-target="quickstart-command"
+                  aria-label="Copy quick start command"
+                  title="Copy quick start command"
+                >
+                  <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M9 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V9Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M20 6 9 17l-5-5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="sr-only">Copy quick start command</span>
+                </button>
+              </div>
+              <div class="quickstart-terminal-body">
+                <div class="typed-command quickstart-command-shell">
+                  <span class="prompt">$</span>
+                  <span id="quickstart-command" aria-live="polite"></span>
+                  <span class="cursor" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section install" id="install">
+          <div class="section-heading">
+            <p class="eyebrow">Installation</p>
+            <h2>Pick the entry point that matches your environment.</h2>
+          </div>
+          <div class="install-grid">
+            <article class="install-card">
+              <h3>Homebrew</h3>
+              <pre><code>brew tap 01x-in/tap
+brew install terrascale</code></pre>
+            </article>
+            <article class="install-card">
+              <h3>Go install</h3>
+              <pre><code>go install github.com/01x-in/terrascale/cmd/terrascale@latest</code></pre>
+            </article>
+            <article class="install-card">
+              <h3>Binary release</h3>
+              <p>Download the release artifact for your platform from GitHub.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>Built by Tushar Sarang. MIT licensed.</p>
+        <div class="footer-links">
+          <a href="https://github.com/01x-in/terrascale">GitHub</a>
+          <a href="https://github.com/01x-in/terrascale/releases">Releases</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
