@@ -1,6 +1,6 @@
 version: "1"
 project:
-    name: terrascale-site
+    name: terrascale
     terraform_dir: .
     mode: root
 state:
@@ -26,9 +26,9 @@ tenants:
     - slug: production
       name: TerraScale Site
       environment: production
-      status: failed
-      created_at: 2026-03-09T10:59:41.580599Z
-      updated_at: 2026-03-09T10:59:54.586594Z
+      status: active
+      created_at: 2026-03-09T11:28:10.862931Z
+      updated_at: 2026-03-09T11:34:03.174044Z
       variables:
         aws_region: us-east-2
         domain_name: terrascale.link
