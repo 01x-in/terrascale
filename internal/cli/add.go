@@ -69,6 +69,26 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// Show AWS identity and confirm before proceeding
+	if !addAutoApprove {
+		identity, err := terraform.GetAWSIdentity()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("\n  AWS Profile:  %s\n", identity.Profile)
+		fmt.Printf("  Account ID:   %s\n", identity.AccountID)
+		fmt.Printf("  Identity:     %s\n\n", identity.ARN)
+
+		confirmed, err := ui.ConfirmYesNo(fmt.Sprintf("Deploy tenant %q to this AWS account?", slug))
+		if err != nil {
+			return err
+		}
+		if !confirmed {
+			ui.Warn("Aborted.")
+			return nil
+		}
+	}
+
 	// Determine terraform working directory
 	tfDir := cwd
 	if cfg.Project.TerraformDir != "" && cfg.Project.TerraformDir != "." {

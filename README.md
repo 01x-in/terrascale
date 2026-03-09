@@ -58,26 +58,29 @@ cd examples/terrascale-site
 # 2. Initialize TerraScale
 terrascale init
 
-# 3. Add your first tenant
-terrascale add tenant-1 \
-  --var project_name=test-1 \
-  --var subdomain=t1
+# 3. Create terraform.tfvars for shared values (gitignored)
+cat > terraform.tfvars <<EOF
+project_name = "my-infra"
+aws_region   = "us-east-1"
+domain_name  = "example.com"
+EOF
 
-# 4. Add a second tenant
-terrascale add tenant-2 \
-  --var project_name=test-2 \
-  --var subdomain=t2
+# 4. Add your first tenant
+terrascale add tenant-1 --var subdomain=t1
 
-# 5. See what you've got
+# 5. Add a second tenant
+terrascale add tenant-2 --var subdomain=t2
+
+# 6. See what you've got
 terrascale list
 
-# 6. Inspect a tenant
+# 7. Inspect a tenant
 terrascale inspect tenant-1
 
-# 7. Tear one down (doesn't affect the other)
+# 8. Tear one down (doesn't affect the other)
 terrascale destroy tenant-1 --auto-approve
 
-# 8. Confirm isolation
+# 9. Confirm isolation
 terrascale list
 ```
 
@@ -115,11 +118,13 @@ terrascale add city-hospital \
 | `--auto-approve` | Skip confirmation prompt | false |
 
 **What happens under the hood:**
-1. Creates `.terrascale/state/<slug>/` for isolated state
-2. Generates `tenant.tfvars` with all variables
-3. Generates backend override pointing to tenant's state directory
-4. Runs `terraform init` → `plan` → `apply`
-5. Captures outputs and saves everything to the registry
+1. Resolves current AWS identity and asks for confirmation
+2. Creates `.terrascale/state/<slug>/` for isolated state
+3. Reads shared variable values from `terraform.tfvars`
+4. Generates `tenant.tfvars` with all variables merged
+5. Generates backend override pointing to tenant's state directory
+6. Runs `terraform init` → `plan` → `apply`
+7. Captures outputs and saves everything to the registry
 
 ### `terrascale list`
 
@@ -190,16 +195,27 @@ state:
   backend: local
 tenant_spec:
   tenant_variables:
-    - name: project_name
-      type: string
-      required: true
     - name: subdomain
       type: string
-      required: true
+      required: false
+      prompt: Subdomain prefix for this tenant.
   shared_variables:
-    environment: production
+    - project_name
+    - aws_region
+    - domain_name
 tenants: []
 ```
+
+**`shared_variables`** lists variable names that are the same across all tenants. Their values are read at runtime from your project's `terraform.tfvars` — keeping sensitive or environment-specific values out of `terrascale.yaml` and out of version control.
+
+```hcl
+# terraform.tfvars  (gitignored)
+project_name = "my-infra"
+aws_region   = "us-east-1"
+domain_name  = "example.com"
+```
+
+If a shared variable isn't in `terraform.tfvars`, Terraform falls back to the `default` defined in `variables.tf`.
 
 ## How It Works
 
