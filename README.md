@@ -27,8 +27,7 @@ TerraScale solves this. It treats your entire Terraform project as a "stamp" and
 ### Homebrew (macOS / Linux)
 
 ```bash
-brew tap 01x-in/tap
-brew install terrascale
+brew install 01x-in/tap/terrascale
 ```
 
 ### From Source
