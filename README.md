@@ -103,7 +103,6 @@ Provision a new tenant with isolated state.
 terrascale add city-hospital \
   --var project_name=emr-city \
   --var subdomain=city-hospital \
-  --tier premium \
   --environment production \
   --name "City General Hospital"
 ```
@@ -112,7 +111,6 @@ terrascale add city-hospital \
 |------|-------------|---------|
 | `--var key=value` | Set a tenant variable (repeatable) | — |
 | `--name` | Display name | slug |
-| `--tier` | Tier preset: basic, standard, premium | standard |
 | `--environment` | Environment type | production |
 | `--auto-approve` | Skip confirmation prompt | false |
 
@@ -130,7 +128,6 @@ Display all tenants in a table.
 ```bash
 terrascale list
 terrascale list --status=active
-terrascale list --tier=premium
 terrascale list --environment=production
 terrascale list --json
 ```
@@ -138,7 +135,6 @@ terrascale list --json
 | Flag | Description |
 |------|-------------|
 | `--status` | Filter by status: active, destroyed, failed, provisioning |
-| `--tier` | Filter by tier: basic, standard, premium |
 | `--environment` | Filter by environment |
 | `--json` | Output as JSON |
 
@@ -180,7 +176,6 @@ TerraScale uses a single `terrascale.yaml` file as the source of truth. It track
 
 - **Project settings** — Terraform directory, project mode
 - **Tenant spec** — which variables change per tenant, which are shared
-- **Tier presets** — default variable overrides per tier (basic/standard/premium)
 - **Tenant registry** — every tenant's slug, status, variables, outputs, and timestamps
 
 Example:
@@ -203,13 +198,6 @@ tenant_spec:
       required: true
   shared_variables:
     environment: production
-tiers:
-  basic:
-    vpc_mode: shared
-    db_instance_class: db.t3.micro
-  premium:
-    vpc_mode: dedicated
-    db_instance_class: db.t3.medium
 tenants: []
 ```
 

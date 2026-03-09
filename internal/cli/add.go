@@ -15,17 +15,15 @@ import (
 )
 
 var (
-	addVars       []string
-	addName       string
-	addTier       string
-	addEnv        string
+	addVars        []string
+	addName        string
+	addEnv         string
 	addAutoApprove bool
 )
 
 func init() {
 	addCmd.Flags().StringArrayVar(&addVars, "var", nil, "Variable in key=value format (can be repeated)")
 	addCmd.Flags().StringVar(&addName, "name", "", "Display name for the tenant")
-	addCmd.Flags().StringVar(&addTier, "tier", "standard", "Tenant tier (basic, standard, premium)")
 	addCmd.Flags().StringVar(&addEnv, "environment", "production", "Environment type")
 	addCmd.Flags().BoolVar(&addAutoApprove, "auto-approve", false, "Skip confirmation prompt")
 	rootCmd.AddCommand(addCmd)
@@ -71,26 +69,31 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// Determine terraform working directory
+	tfDir := cwd
+	if cfg.Project.TerraformDir != "" && cfg.Project.TerraformDir != "." {
+		tfDir = filepath.Join(cwd, cfg.Project.TerraformDir)
+	}
+
 	// Parse --var flags into map
 	varMap := parseVarFlags(addVars)
 
-	// Merge shared variables
+	// Read shared variable values from terraform.tfvars (if it exists)
 	allVars := make(map[string]string)
-	for key, value := range cfg.TenantSpec.SharedVariables {
-		allVars[key] = value
+	if len(cfg.TenantSpec.SharedVariables) > 0 {
+		tfvarsValues, err := terraform.ReadTfvars(filepath.Join(tfDir, "terraform.tfvars"))
+		if err != nil {
+			return fmt.Errorf("reading terraform.tfvars: %w", err)
+		}
+		for _, name := range cfg.TenantSpec.SharedVariables {
+			if val, ok := tfvarsValues[name]; ok {
+				allVars[name] = val
+			}
+			// If not in tfvars, skip — Terraform will use the variable's default
+		}
 	}
 
-	// Apply tier presets
-	if preset, ok := cfg.Tiers[addTier]; ok {
-		if preset.VpcMode != "" {
-			allVars["vpc_mode"] = preset.VpcMode
-		}
-		if preset.DbInstanceClass != "" {
-			allVars["db_instance_class"] = preset.DbInstanceClass
-		}
-	}
-
-	// Apply provided variables (override presets and defaults)
+	// Apply provided variables (override defaults)
 	for key, value := range varMap {
 		allVars[key] = value
 	}
@@ -126,12 +129,6 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Determine terraform working directory
-	tfDir := cwd
-	if cfg.Project.TerraformDir != "" && cfg.Project.TerraformDir != "." {
-		tfDir = filepath.Join(cwd, cfg.Project.TerraformDir)
-	}
-
 	// Create state directory
 	stateDir, err := terraform.CreateStateDir(cwd, slug)
 	if err != nil {
@@ -163,7 +160,6 @@ func runAdd(cmd *cobra.Command, args []string) error {
 	tenant := config.Tenant{
 		Slug:        slug,
 		Name:        addName,
-		Tier:        addTier,
 		Environment: addEnv,
 		Status:      config.StatusProvisioning,
 		CreatedAt:   now,

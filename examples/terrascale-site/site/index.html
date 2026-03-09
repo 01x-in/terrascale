@@ -194,25 +194,31 @@
             </div>
           </div>
 
-          <div class="steps-grid">
-            <article class="step-card">
-              <span class="step-index">01</span>
-              <h3><code>terrascale init</code></h3>
-              <pre><code>cd your-project
-terrascale init</code></pre>
+          <div class="workflow-grid">
+            <article class="workflow-card">
+              <h3><span class="step-index-inline">01.</span> Scan the project</h3>
+              <p>
+                TerraScale reads your Terraform root, discovers variables, and
+                classifies what changes per tenant versus what stays shared.
+              </p>
+              <p class="workflow-meta">variables.tf -> terrascale.yaml</p>
             </article>
-            <article class="step-card">
-              <span class="step-index">02</span>
-              <h3><code>terrascale add &lt;slug&gt;</code></h3>
-              <pre><code>terrascale add acme-corp \
-  --var project_name=scaled-app \
-  --var subdomain=acme-corp</code></pre>
+            <article class="workflow-card">
+              <h3><span class="step-index-inline">02.</span> Create isolated state</h3>
+              <p>
+                For each tenant, it generates tenant tfvars, creates a separate
+                state path, and points Terraform at that isolated backend.
+              </p>
+              <p class="workflow-meta">.terrascale/state/acme-corp/</p>
             </article>
-            <article class="step-card">
-              <span class="step-index">03</span>
-              <h3><code>terrascale list</code></h3>
-              <pre><code>terrascale list
-terrascale inspect acme-corp</code></pre>
+            <article class="workflow-card">
+              <h3><span class="step-index-inline">03.</span> Run and register</h3>
+              <p>
+                Terraform init, plan, apply, and output capture all run per
+                tenant, then TerraScale records status and outputs in the
+                registry.
+              </p>
+              <p class="workflow-meta">apply -> outputs -> tenant registry</p>
             </article>
           </div>
         </section>
@@ -317,8 +323,10 @@ terrascale inspect acme-corp</code></pre>
                 <span></span>
                 <span></span>
                 <p class="quickstart-window-title">Command Preview</p>
+              </div>
+              <div class="quickstart-terminal-body">
                 <button
-                  class="copy-button quickstart-title-copy"
+                  class="copy-button quickstart-copy-floating"
                   type="button"
                   data-copied="false"
                   data-copy-target="quickstart-command"
@@ -354,12 +362,12 @@ terrascale inspect acme-corp</code></pre>
                   </svg>
                   <span class="sr-only">Copy quick start command</span>
                 </button>
-              </div>
-              <div class="quickstart-terminal-body">
                 <div class="typed-command quickstart-command-shell">
                   <span class="prompt">$</span>
-                  <span id="quickstart-command" aria-live="polite"></span>
-                  <span class="cursor" aria-hidden="true"></span>
+                  <span class="quickstart-command-inline">
+                    <span id="quickstart-command" aria-live="polite"></span>
+                    <span class="cursor" aria-hidden="true"></span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -373,24 +381,123 @@ terrascale inspect acme-corp</code></pre>
           </div>
           <div class="install-grid">
             <article class="install-card">
-              <h3>Homebrew</h3>
+              <div class="install-card-header">
+                <h3>Homebrew</h3>
+                <button
+                  class="copy-button install-copy-button"
+                  type="button"
+                  data-copied="false"
+                  data-copy="brew tap 01x-in/tap
+brew install terrascale"
+                  aria-label="Copy Homebrew install command"
+                  title="Copy Homebrew install command"
+                >
+                  <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M9 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V9Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M20 6 9 17l-5-5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="sr-only">Copy Homebrew install command</span>
+                </button>
+              </div>
               <pre><code>brew tap 01x-in/tap
 brew install terrascale</code></pre>
             </article>
             <article class="install-card">
-              <h3>Go install</h3>
+              <div class="install-card-header">
+                <h3>Go install</h3>
+                <button
+                  class="copy-button install-copy-button"
+                  type="button"
+                  data-copied="false"
+                  data-copy="go install github.com/01x-in/terrascale/cmd/terrascale@latest"
+                  aria-label="Copy Go install command"
+                  title="Copy Go install command"
+                >
+                  <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M9 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V9Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M20 6 9 17l-5-5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="sr-only">Copy Go install command</span>
+                </button>
+              </div>
               <pre><code>go install github.com/01x-in/terrascale/cmd/terrascale@latest</code></pre>
             </article>
-            <article class="install-card">
-              <h3>Binary release</h3>
-              <p>Download the release artifact for your platform from GitHub.</p>
-            </article>
+            <a
+              class="install-card install-card-link"
+              href="https://github.com/01x-in/terrascale/releases"
+            >
+              <div class="install-card-header">
+                <h3>Binary release</h3>
+              </div>
+              <pre><code>Download the release artifact for your platform from GitHub.</code></pre>
+            </a>
           </div>
         </section>
       </main>
 
       <footer class="footer">
-        <p>Built by Tushar Sarang. MIT licensed.</p>
+        <div class="footer-copy">
+          <div class="footer-signoff">
+            <img
+              class="footer-logo"
+              src="./logo-01x.svg"
+              alt="01X"
+              width="44"
+              height="20"
+            />
+            <span class="footer-divider" aria-hidden="true"></span>
+            <p>Built by people who build. MIT licensed.</p>
+          </div>
+          <p class="footer-copyright">
+            <a href="https://01x.in">© 2026 01X. All rights reserved.</a>
+          </p>
+        </div>
         <div class="footer-links">
           <a href="https://github.com/01x-in/terrascale">GitHub</a>
           <a href="https://github.com/01x-in/terrascale/releases">Releases</a>

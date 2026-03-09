@@ -57,7 +57,7 @@ crash.log
 
 # Specific .tfvars files that might contain sensitive data
 # (consider using a consistent naming convention for sensitive files, e.g., secrets.tfvars)
-# *.tfvars 
+*.tfvars 
 
 # You might want to ignore the lock file if working solo, but include it in team environments
 .terraform.lock.hcl

@@ -19,7 +19,6 @@ state:
   backend: local
 tenant_spec:
   tenant_variables: []
-  shared_variables: {}
 tenants: []
 `
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
@@ -107,8 +106,6 @@ func TestSaveConfig_RoundTrip(t *testing.T) {
 	original.TenantSpec.TenantVariables = []VariableDef{
 		{Name: "project_name", Type: "string", Required: true},
 	}
-	original.Tiers["starter"] = TierPreset{VpcMode: "shared", DbInstanceClass: "db.t3.micro"}
-
 	if err := SaveConfig(original, path); err != nil {
 		t.Fatalf("SaveConfig returned error: %v", err)
 	}
@@ -135,16 +132,6 @@ func TestSaveConfig_RoundTrip(t *testing.T) {
 	}
 	if loaded.TenantSpec.TenantVariables[0].Name != "project_name" {
 		t.Errorf("expected tenant variable name 'project_name', got %q", loaded.TenantSpec.TenantVariables[0].Name)
-	}
-	tier, ok := loaded.Tiers["starter"]
-	if !ok {
-		t.Fatal("expected 'starter' tier to exist")
-	}
-	if tier.VpcMode != "shared" {
-		t.Errorf("expected vpc_mode 'shared', got %q", tier.VpcMode)
-	}
-	if tier.DbInstanceClass != "db.t3.micro" {
-		t.Errorf("expected db_instance_class 'db.t3.micro', got %q", tier.DbInstanceClass)
 	}
 }
 
@@ -271,12 +258,6 @@ func TestDefaultConfig(t *testing.T) {
 	}
 	if cfg.State.Backend != "local" {
 		t.Errorf("expected backend 'local', got %q", cfg.State.Backend)
-	}
-	if cfg.TenantSpec.SharedVariables == nil {
-		t.Error("expected SharedVariables to be initialized, got nil")
-	}
-	if cfg.Tiers == nil {
-		t.Error("expected Tiers to be initialized, got nil")
 	}
 	if cfg.Tenants == nil {
 		t.Error("expected Tenants to be initialized, got nil")

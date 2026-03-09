@@ -110,25 +110,9 @@ func runInit(cmd *cobra.Command, args []string) error {
 				varDef.Prompt = v.Description
 			}
 			cfg.TenantSpec.TenantVariables = append(cfg.TenantSpec.TenantVariables, varDef)
-		} else if v.HasDefault {
-			cfg.TenantSpec.SharedVariables[v.Name] = v.Default
+		} else {
+			cfg.TenantSpec.SharedVariables = append(cfg.TenantSpec.SharedVariables, v.Name)
 		}
-	}
-
-	// Set up default tiers
-	cfg.Tiers = map[string]config.TierPreset{
-		"basic": {
-			VpcMode:         "shared",
-			DbInstanceClass: "db.t3.micro",
-		},
-		"standard": {
-			VpcMode:         "shared",
-			DbInstanceClass: "db.t3.small",
-		},
-		"premium": {
-			VpcMode:         "dedicated",
-			DbInstanceClass: "db.t3.medium",
-		},
 	}
 
 	// Capture outputs

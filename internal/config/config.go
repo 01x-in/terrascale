@@ -10,12 +10,11 @@ import (
 const ConfigFileName = "terrascale.yaml"
 
 type Config struct {
-	Version    string                `yaml:"version"`
-	Project    Project               `yaml:"project"`
-	State      StateConfig           `yaml:"state"`
-	TenantSpec TenantSpec            `yaml:"tenant_spec"`
-	Tiers      map[string]TierPreset `yaml:"tiers,omitempty"`
-	Tenants    []Tenant              `yaml:"tenants"`
+	Version    string     `yaml:"version"`
+	Project    Project    `yaml:"project"`
+	State      StateConfig `yaml:"state"`
+	TenantSpec TenantSpec `yaml:"tenant_spec"`
+	Tenants    []Tenant   `yaml:"tenants"`
 }
 
 type Project struct {
@@ -30,11 +29,6 @@ type StateConfig struct {
 	S3Bucket      string `yaml:"s3_bucket,omitempty"`
 	S3Region      string `yaml:"s3_region,omitempty"`
 	DynamoDBTable string `yaml:"dynamodb_table,omitempty"`
-}
-
-type TierPreset struct {
-	VpcMode         string `yaml:"vpc_mode,omitempty"`
-	DbInstanceClass string `yaml:"db_instance_class,omitempty"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -99,10 +93,7 @@ func DefaultConfig(name string) *Config {
 		State: StateConfig{
 			Backend: "local",
 		},
-		TenantSpec: TenantSpec{
-			SharedVariables: make(map[string]string),
-		},
-		Tiers:   make(map[string]TierPreset),
+		TenantSpec: TenantSpec{},
 		Tenants: []Tenant{},
 	}
 }

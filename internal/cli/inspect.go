@@ -120,7 +120,6 @@ func printTenantDetail(tenant *config.Tenant) error {
 	fmt.Printf("  %s\n", ui.Bold(tenant.Slug))
 	fmt.Println()
 	fmt.Printf("  Name:        %s\n", tenant.Name)
-	fmt.Printf("  Tier:        %s\n", tenant.Tier)
 	fmt.Printf("  Environment: %s\n", tenant.Environment)
 	fmt.Printf("  Status:      %s\n", tenant.Status)
 	fmt.Printf("  State Path:  %s\n", tenant.StatePath)

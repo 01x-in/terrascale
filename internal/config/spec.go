@@ -2,7 +2,7 @@ package config
 
 type TenantSpec struct {
 	TenantVariables []VariableDef     `yaml:"tenant_variables"`
-	SharedVariables map[string]string `yaml:"shared_variables,omitempty"`
+	SharedVariables []string          `yaml:"shared_variables,omitempty"`
 	Outputs         []string          `yaml:"outputs,omitempty"`
 }
 

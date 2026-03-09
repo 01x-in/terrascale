@@ -1,6 +1,7 @@
 variable "project_name" {
   type        = string
   description = "Unique project identifier for this deployment."
+  default     = "terrascale"
 }
 
 variable "subdomain" {

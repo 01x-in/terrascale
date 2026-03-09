@@ -20,7 +20,6 @@ const (
 type Tenant struct {
 	Slug         string            `yaml:"slug"`
 	Name         string            `yaml:"name"`
-	Tier         string            `yaml:"tier"`
 	Environment  string            `yaml:"environment"`
 	Status       TenantStatus      `yaml:"status"`
 	CreatedAt    time.Time         `yaml:"created_at"`

@@ -10,7 +10,6 @@ import (
 
 type TenantFilters struct {
 	Status      string
-	Tier        string
 	Environment string
 }
 
@@ -88,10 +87,7 @@ func ListTenants(cfg *config.Config, filters TenantFilters) []config.Tenant {
 		if filters.Status != "" && string(tenant.Status) != strings.ToLower(filters.Status) {
 			continue
 		}
-		if filters.Tier != "" && tenant.Tier != strings.ToLower(filters.Tier) {
-			continue
-		}
-		if filters.Environment != "" && tenant.Environment != strings.ToLower(filters.Environment) {
+if filters.Environment != "" && tenant.Environment != strings.ToLower(filters.Environment) {
 			continue
 		}
 		result = append(result, tenant)

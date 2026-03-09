@@ -35,6 +35,35 @@ func GenerateTfvars(variables map[string]string, path string) error {
 	return nil
 }
 
+// ReadTfvars parses a .tfvars file and returns a map of variable name → value.
+// Only simple string assignments (key = "value") are parsed; complex types are skipped.
+func ReadTfvars(path string) (map[string]string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return map[string]string{}, nil
+		}
+		return nil, fmt.Errorf("reading tfvars file: %w", err)
+	}
+
+	result := make(map[string]string)
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+		val = strings.Trim(val, `"`)
+		result[key] = val
+	}
+	return result, nil
+}
+
 // GenerateBackendOverride writes a backend override file that points
 // terraform state to the tenant's isolated state directory.
 func GenerateBackendOverride(stateDir string, path string) error {

@@ -20,8 +20,7 @@ func testConfig() *config.Config {
 			{
 				Slug:        "tenant-1",
 				Name:        "Tenant One",
-				Tier:        "basic",
-				Environment: "production",
+					Environment: "production",
 				Status:      config.StatusActive,
 				CreatedAt:   time.Now().UTC(),
 				UpdatedAt:   time.Now().UTC(),
@@ -32,8 +31,7 @@ func testConfig() *config.Config {
 			{
 				Slug:        "tenant-2",
 				Name:        "Tenant Two",
-				Tier:        "premium",
-				Environment: "uat",
+					Environment: "uat",
 				Status:      config.StatusDestroyed,
 				CreatedAt:   time.Now().UTC(),
 				UpdatedAt:   time.Now().UTC(),
@@ -50,7 +48,6 @@ func TestAddTenant(t *testing.T) {
 	tenant := config.Tenant{
 		Slug:        "tenant-3",
 		Name:        "Tenant Three",
-		Tier:        "standard",
 		Environment: "demo",
 		Status:      config.StatusActive,
 		Variables:   map[string]string{"project_name": "t3"},
@@ -182,12 +179,11 @@ func TestListTenants(t *testing.T) {
 		{"no filters", TenantFilters{}, 2},
 		{"filter by status active", TenantFilters{Status: "active"}, 1},
 		{"filter by status destroyed", TenantFilters{Status: "destroyed"}, 1},
-		{"filter by tier premium", TenantFilters{Tier: "premium"}, 1},
 		{"filter by environment production", TenantFilters{Environment: "production"}, 1},
 		{"filter by environment uat", TenantFilters{Environment: "uat"}, 1},
 		{"filter no match", TenantFilters{Status: "failed"}, 0},
-		{"combined filters", TenantFilters{Status: "active", Tier: "basic"}, 1},
-		{"combined filters no match", TenantFilters{Status: "active", Tier: "premium"}, 0},
+		{"combined filters", TenantFilters{Status: "active", Environment: "production"}, 1},
+		{"combined filters no match", TenantFilters{Status: "active", Environment: "uat"}, 0},
 	}
 
 	for _, tt := range tests {

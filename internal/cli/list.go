@@ -14,14 +14,12 @@ import (
 
 var (
 	listStatus      string
-	listTier        string
 	listEnvironment string
 	listJSON        bool
 )
 
 func init() {
 	listCmd.Flags().StringVar(&listStatus, "status", "", "Filter by status (active, destroyed, failed, provisioning)")
-	listCmd.Flags().StringVar(&listTier, "tier", "", "Filter by tier (basic, standard, premium)")
 	listCmd.Flags().StringVar(&listEnvironment, "environment", "", "Filter by environment (development, uat, staging, demo, production)")
 	listCmd.Flags().BoolVar(&listJSON, "json", false, "Output in JSON format")
 	rootCmd.AddCommand(listCmd)
@@ -30,7 +28,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all tenants",
-	Long:  `Display a table of all tenants with their status, tier, and environment.`,
+	Long:  `Display a table of all tenants with their status and environment.`,
 	RunE:  runList,
 }
 
@@ -48,7 +46,6 @@ func runList(cmd *cobra.Command, args []string) error {
 
 	filters := registry.TenantFilters{
 		Status:      listStatus,
-		Tier:        listTier,
 		Environment: listEnvironment,
 	}
 	tenants := registry.ListTenants(cfg, filters)
@@ -62,14 +59,13 @@ func runList(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	headers := []string{"SLUG", "NAME", "TIER", "ENVIRONMENT", "STATUS", "CREATED"}
+	headers := []string{"SLUG", "NAME", "ENVIRONMENT", "STATUS", "CREATED"}
 	var rows [][]string
 	for _, t := range tenants {
 		created := t.CreatedAt.Format("2006-01-02")
 		rows = append(rows, []string{
 			t.Slug,
 			t.Name,
-			t.Tier,
 			t.Environment,
 			string(t.Status),
 			created,
