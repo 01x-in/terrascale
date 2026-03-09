@@ -7,9 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Version is set at build time via -ldflags.
+var Version = "dev"
+
 var rootCmd = &cobra.Command{
-	Use:   "terrascale",
-	Short: "Multi-tenant lifecycle manager for Terraform",
+	Use:     "terrascale",
+	Version: Version,
+	Short:   "Multi-tenant lifecycle manager for Terraform",
 	Long: `TerraScale wraps your existing Terraform project to provision, manage,
 and destroy isolated tenants — each with their own state file and configuration.
 
