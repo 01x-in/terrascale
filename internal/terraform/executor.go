@@ -45,7 +45,7 @@ func FindTerraformBinary() (string, error) {
 }
 
 func (e *Executor) Init(backendConfig map[string]string) error {
-	args := []string{"init", "-input=false"}
+	args := []string{"init", "-input=false", "-reconfigure"}
 	for key, value := range backendConfig {
 		args = append(args, fmt.Sprintf("-backend-config=%s=%s", key, value))
 	}
