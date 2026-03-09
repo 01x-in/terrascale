@@ -28,7 +28,7 @@ tenants:
       environment: production
       status: active
       created_at: 2026-03-09T11:28:10.862931Z
-      updated_at: 2026-03-09T11:34:03.174044Z
+      updated_at: 2026-03-09T15:11:46.027929Z
       variables:
         aws_region: us-east-2
         domain_name: terrascale.link
