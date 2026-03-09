@@ -126,6 +126,19 @@ terrascale add city-hospital \
 6. Runs `terraform init` → `plan` → `apply`
 7. Captures outputs and saves everything to the registry
 
+### `terrascale apply <slug>`
+
+Re-run terraform plan and apply for an existing tenant. Use this to retry a failed provisioning or pick up configuration changes.
+
+```bash
+terrascale apply production
+terrascale apply production --auto-approve
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--auto-approve` | Skip confirmation prompts | false |
+
 ### `terrascale list`
 
 Display all tenants in a table.

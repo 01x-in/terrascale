@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -47,61 +49,53 @@ func (e *Executor) Init(backendConfig map[string]string) error {
 	for key, value := range backendConfig {
 		args = append(args, fmt.Sprintf("-backend-config=%s=%s", key, value))
 	}
-	_, stderr, err := e.run(args...)
+	_, err := e.runStreaming(args...)
 	if err != nil {
-		return fmt.Errorf("terraform init failed: %s\n%s", err, stderr)
+		return fmt.Errorf("terraform init failed: %w", err)
 	}
 	return nil
 }
 
 func (e *Executor) Plan(tfvarsPath string) (*PlanResult, error) {
-	args := []string{"plan", "-input=false", "-no-color"}
+	args := []string{"plan", "-input=false"}
 	if tfvarsPath != "" {
 		args = append(args, fmt.Sprintf("-var-file=%s", tfvarsPath))
 	}
-	stdout, stderr, err := e.run(args...)
+	captured, err := e.runStreaming(args...)
 	if err != nil {
-		return nil, fmt.Errorf("terraform plan failed: %s\n%s", err, stderr)
+		return nil, fmt.Errorf("terraform plan failed: %w", err)
 	}
-	result := &PlanResult{
-		RawOutput: stdout,
-	}
-	result.ToAdd, result.ToChange, result.ToDestroy = parsePlanCounts(stdout)
+	result := &PlanResult{RawOutput: captured}
+	result.ToAdd, result.ToChange, result.ToDestroy = parsePlanCounts(captured)
 	return result, nil
 }
 
 func (e *Executor) Apply(tfvarsPath string, autoApprove bool) (*ApplyResult, error) {
-	args := []string{"apply", "-input=false", "-no-color"}
+	args := []string{"apply", "-input=false"}
 	if autoApprove {
 		args = append(args, "-auto-approve")
 	}
 	if tfvarsPath != "" {
 		args = append(args, fmt.Sprintf("-var-file=%s", tfvarsPath))
 	}
-	stdout, stderr, err := e.run(args...)
+	captured, err := e.runStreaming(args...)
 	if err != nil {
-		return &ApplyResult{
-			Success:   false,
-			RawOutput: stdout + "\n" + stderr,
-		}, fmt.Errorf("terraform apply failed: %s\n%s", err, stderr)
+		return &ApplyResult{Success: false, RawOutput: captured}, fmt.Errorf("terraform apply failed: %w", err)
 	}
-	return &ApplyResult{
-		Success:   true,
-		RawOutput: stdout,
-	}, nil
+	return &ApplyResult{Success: true, RawOutput: captured}, nil
 }
 
 func (e *Executor) Destroy(tfvarsPath string, autoApprove bool) error {
-	args := []string{"destroy", "-input=false", "-no-color"}
+	args := []string{"destroy", "-input=false"}
 	if autoApprove {
 		args = append(args, "-auto-approve")
 	}
 	if tfvarsPath != "" {
 		args = append(args, fmt.Sprintf("-var-file=%s", tfvarsPath))
 	}
-	_, stderr, err := e.run(args...)
+	_, err := e.runStreaming(args...)
 	if err != nil {
-		return fmt.Errorf("terraform destroy failed: %s\n%s", err, stderr)
+		return fmt.Errorf("terraform destroy failed: %w", err)
 	}
 	return nil
 }
@@ -122,6 +116,20 @@ func (e *Executor) Refresh() error {
 	return nil
 }
 
+// runStreaming streams stdout/stderr to the terminal and also captures output for parsing.
+func (e *Executor) runStreaming(args ...string) (string, error) {
+	cmd := exec.Command(e.tfBinary, args...)
+	cmd.Dir = e.workDir
+
+	var captured bytes.Buffer
+	cmd.Stdout = io.MultiWriter(os.Stdout, &captured)
+	cmd.Stderr = io.MultiWriter(os.Stderr, &captured)
+
+	err := cmd.Run()
+	return captured.String(), err
+}
+
+// run captures output without streaming (used for output -json and refresh).
 func (e *Executor) run(args ...string) (string, string, error) {
 	cmd := exec.Command(e.tfBinary, args...)
 	cmd.Dir = e.workDir
@@ -134,12 +142,15 @@ func (e *Executor) run(args ...string) (string, string, error) {
 	return stdout.String(), stderr.String(), err
 }
 
-// parsePlanCounts extracts add/change/destroy counts from terraform plan output.
-// Matches patterns like "Plan: 3 to add, 1 to change, 0 to destroy."
+// ansiRegex strips ANSI escape codes for text parsing.
+var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
+// planCountRegex matches "Plan: 3 to add, 1 to change, 0 to destroy."
 var planCountRegex = regexp.MustCompile(`Plan:\s+(\d+)\s+to add,\s+(\d+)\s+to change,\s+(\d+)\s+to destroy`)
 
 func parsePlanCounts(output string) (add, change, destroy int) {
-	matches := planCountRegex.FindStringSubmatch(output)
+	clean := ansiRegex.ReplaceAllString(output, "")
+	matches := planCountRegex.FindStringSubmatch(clean)
 	if len(matches) == 4 {
 		fmt.Sscanf(matches[1], "%d", &add)
 		fmt.Sscanf(matches[2], "%d", &change)
