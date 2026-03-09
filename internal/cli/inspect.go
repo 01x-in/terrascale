@@ -53,6 +53,8 @@ func runInspect(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	stateDir := filepath.Join(cwd, tenant.StatePath)
+
 	// Optionally refresh state
 	if inspectRefresh && tenant.Status == config.StatusActive {
 		tfBinary, err := terraform.FindTerraformBinary()
@@ -70,33 +72,39 @@ func runInspect(cmd *cobra.Command, args []string) error {
 		if err := executor.Refresh(); err != nil {
 			ui.Warn(fmt.Sprintf("Refresh failed: %v", err))
 		} else {
-			// Re-capture outputs after refresh
 			outputs, err := executor.Output()
 			if err == nil {
-				if err := registry.UpdateTenantOutputs(cfg, slug, outputs); err != nil {
-					ui.Warn(fmt.Sprintf("Could not update outputs: %v", err))
-				} else {
-					config.SaveConfig(cfg, configPath)
-					tenant, _ = registry.GetTenant(cfg, slug)
+				if err := terraform.SaveOutputs(stateDir, outputs); err != nil {
+					ui.Warn(fmt.Sprintf("Could not save outputs: %v", err))
 				}
 			}
 			ui.Success("State refreshed")
 		}
 	}
 
+	outputs, err := terraform.LoadOutputs(stateDir)
+	if err != nil {
+		ui.Warn(fmt.Sprintf("Could not load outputs: %v", err))
+		outputs = map[string]string{}
+	}
+
 	if inspectJSON {
-		return printTenantJSON(tenant)
+		return printTenantJSON(tenant, outputs)
 	}
 
 	if inspectOutputsOnly {
-		return printOutputsOnly(tenant)
+		return printOutputsOnly(outputs)
 	}
 
-	return printTenantDetail(tenant)
+	return printTenantDetail(tenant, outputs)
 }
 
-func printTenantJSON(tenant *config.Tenant) error {
-	data, err := json.MarshalIndent(tenant, "", "  ")
+func printTenantJSON(tenant *config.Tenant, outputs map[string]string) error {
+	type tenantView struct {
+		*config.Tenant
+		Outputs map[string]string `json:"outputs,omitempty"`
+	}
+	data, err := json.MarshalIndent(tenantView{tenant, outputs}, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshaling JSON: %w", err)
 	}
@@ -104,18 +112,18 @@ func printTenantJSON(tenant *config.Tenant) error {
 	return nil
 }
 
-func printOutputsOnly(tenant *config.Tenant) error {
-	if len(tenant.Outputs) == 0 {
+func printOutputsOnly(outputs map[string]string) error {
+	if len(outputs) == 0 {
 		fmt.Println("No outputs captured for this tenant.")
 		return nil
 	}
-	for key, value := range tenant.Outputs {
+	for key, value := range outputs {
 		fmt.Printf("%s = %s\n", key, value)
 	}
 	return nil
 }
 
-func printTenantDetail(tenant *config.Tenant) error {
+func printTenantDetail(tenant *config.Tenant, outputs map[string]string) error {
 	fmt.Println()
 	fmt.Printf("  %s\n", ui.Bold(tenant.Slug))
 	fmt.Println()
@@ -134,10 +142,10 @@ func printTenantDetail(tenant *config.Tenant) error {
 		}
 	}
 
-	if len(tenant.Outputs) > 0 {
+	if len(outputs) > 0 {
 		fmt.Println()
 		fmt.Println("  Outputs:")
-		for key, value := range tenant.Outputs {
+		for key, value := range outputs {
 			fmt.Printf("    %s = %s\n", key, value)
 		}
 	}

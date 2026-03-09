@@ -25,7 +25,6 @@ type Tenant struct {
 	CreatedAt    time.Time         `yaml:"created_at"`
 	UpdatedAt    time.Time         `yaml:"updated_at"`
 	Variables    map[string]string `yaml:"variables"`
-	Outputs      map[string]string `yaml:"outputs,omitempty"`
 	StatePath    string            `yaml:"state_path"`
 	AccountMode  string            `yaml:"account_mode"`
 	AWSAccountID string            `yaml:"aws_account_id,omitempty"`

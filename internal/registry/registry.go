@@ -67,16 +67,6 @@ func UpdateTenantStatus(cfg *config.Config, slug string, status config.TenantSta
 	return nil
 }
 
-func UpdateTenantOutputs(cfg *config.Config, slug string, outputs map[string]string) error {
-	tenant, err := GetTenant(cfg, slug)
-	if err != nil {
-		return err
-	}
-	tenant.Outputs = outputs
-	tenant.UpdatedAt = time.Now().UTC()
-	return nil
-}
-
 func TenantExists(cfg *config.Config, slug string) bool {
 	return config.SlugExists(cfg, slug)
 }

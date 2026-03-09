@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -51,4 +52,35 @@ func EnsureTerrascaleDir(baseDir string) error {
 // GetStatePath returns the relative state path for a tenant.
 func GetStatePath(slug string) string {
 	return filepath.Join(TerrascaleDir, StateDir, slug)
+}
+
+// SaveOutputs writes tenant outputs to outputs.json in the state directory.
+func SaveOutputs(stateDir string, outputs map[string]string) error {
+	data, err := json.MarshalIndent(outputs, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshaling outputs: %w", err)
+	}
+	path := filepath.Join(stateDir, "outputs.json")
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("writing outputs.json: %w", err)
+	}
+	return nil
+}
+
+// LoadOutputs reads tenant outputs from outputs.json in the state directory.
+// Returns an empty map if the file does not exist.
+func LoadOutputs(stateDir string) (map[string]string, error) {
+	path := filepath.Join(stateDir, "outputs.json")
+	data, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		return map[string]string{}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("reading outputs.json: %w", err)
+	}
+	var outputs map[string]string
+	if err := json.Unmarshal(data, &outputs); err != nil {
+		return nil, fmt.Errorf("parsing outputs.json: %w", err)
+	}
+	return outputs, nil
 }

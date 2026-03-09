@@ -142,22 +142,6 @@ func TestUpdateTenantStatus(t *testing.T) {
 	}
 }
 
-func TestUpdateTenantOutputs(t *testing.T) {
-	cfg := testConfig()
-	outputs := map[string]string{
-		"vpc_id":      "vpc-123",
-		"db_endpoint": "db.example.com",
-	}
-	err := UpdateTenantOutputs(cfg, "tenant-1", outputs)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	tenant, _ := GetTenant(cfg, "tenant-1")
-	if tenant.Outputs["vpc_id"] != "vpc-123" {
-		t.Errorf("expected 'vpc-123', got %q", tenant.Outputs["vpc_id"])
-	}
-}
-
 func TestTenantExists(t *testing.T) {
 	cfg := testConfig()
 	if !TenantExists(cfg, "tenant-1") {

@@ -252,11 +252,13 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		outputs = map[string]string{}
 	}
 
+	// Save outputs to state directory (not in terrascale.yaml)
+	if err := terraform.SaveOutputs(stateDir, outputs); err != nil {
+		ui.Warn(fmt.Sprintf("Could not save outputs: %v", err))
+	}
+
 	// Update tenant status to active
 	if err := registry.UpdateTenantStatus(cfg, slug, config.StatusActive); err != nil {
-		return err
-	}
-	if err := registry.UpdateTenantOutputs(cfg, slug, outputs); err != nil {
 		return err
 	}
 	if err := config.SaveConfig(cfg, configPath); err != nil {
