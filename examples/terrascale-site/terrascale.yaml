@@ -9,7 +9,7 @@ tenant_spec:
     tenant_variables:
         - name: subdomain
           type: string
-          required: false
+          required: true
           prompt: Subdomain prefix. Use an empty string for the apex domain.
         - name: environment
           type: string
@@ -35,6 +35,5 @@ tenants:
         environment: production
         hosted_zone_name: terrascale.link
         project_name: terrascale
-        subdomain: ""
       state_path: .terrascale/state/production/
       account_mode: same

@@ -123,6 +123,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		if _, exists := allVars[varDef.Name]; exists {
 			continue
 		}
+		resolvedDefault := strings.ReplaceAll(varDef.Default, "$slug", slug)
 		if varDef.Required {
 			prompt := varDef.Prompt
 			if prompt == "" {
@@ -135,17 +136,17 @@ func runAdd(cmd *cobra.Command, args []string) error {
 				}
 				allVars[varDef.Name] = value
 			} else {
-				value, err := ui.InputString(prompt, varDef.Default)
+				value, err := ui.InputString(prompt, resolvedDefault)
 				if err != nil {
 					return err
 				}
-				if value == "" && varDef.Default != "" {
-					value = varDef.Default
+				if value == "" && resolvedDefault != "" {
+					value = resolvedDefault
 				}
 				allVars[varDef.Name] = value
 			}
-		} else if varDef.Default != "" {
-			allVars[varDef.Name] = varDef.Default
+		} else if resolvedDefault != "" {
+			allVars[varDef.Name] = resolvedDefault
 		}
 	}
 

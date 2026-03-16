@@ -229,6 +229,23 @@ domain_name  = "example.com"
 
 If a shared variable isn't in `terraform.tfvars`, Terraform falls back to the `default` defined in `variables.tf`.
 
+**`$slug` in defaults** — use `$slug` as a default value for any tenant variable and it will be automatically replaced with the tenant's slug at provisioning time:
+
+```yaml
+tenant_variables:
+  - name: project_name
+    type: string
+    required: true
+    default: "$slug"
+```
+
+```bash
+terrascale add city-hospital   # project_name defaults to "city-hospital"
+terrascale add acme-corp       # project_name defaults to "acme-corp"
+```
+
+The user can still override it with `--var project_name=something-else`.
+
 ## How It Works
 
 TerraScale is a wrapper around the `terraform` binary. It never modifies your `.tf` files.

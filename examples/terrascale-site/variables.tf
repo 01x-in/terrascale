@@ -7,7 +7,6 @@ variable "project_name" {
 variable "subdomain" {
   type        = string
   description = "Subdomain prefix. Use an empty string for the apex domain."
-  default     = ""
 }
 
 variable "environment" {
