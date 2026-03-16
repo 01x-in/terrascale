@@ -138,9 +138,16 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println()
-	ui.Success("TerraScale initialized! Next steps:")
-	fmt.Println("  1. Review terrascale.yaml and adjust variable settings")
-	fmt.Println("  2. Run 'terrascale add <slug>' to provision your first tenant")
+	ui.Success("TerraScale initialized!")
+	fmt.Println()
+	fmt.Println(ui.Bold("  ⚠  Review terrascale.yaml before continuing"))
+	fmt.Println("  Open terrascale.yaml and verify:")
+	fmt.Println("    • tenant_variables  — variables that differ per tenant")
+	fmt.Println("    • shared_variables  — variables shared across all tenants")
+	fmt.Println("    • defaults / prompts for each variable")
+	fmt.Println()
+	fmt.Println("  When ready:")
+	fmt.Println("  Run 'terrascale add <slug>' to provision your first tenant")
 
 	return nil
 }
